@@ -18,6 +18,17 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+//add car
+app.post('/cars', async (req, res) => {
+  try {
+    const newCar = req.body;
+    const result = await carsCollection.insertOne(newCar);
+    res.status(201).send(result);
+  } catch (error) {
+    console.error("Error adding car:", error);
+    res.status(500).send({ error: "Failed to add car" });
+  }
+});
 
 async function run() {
   try {
