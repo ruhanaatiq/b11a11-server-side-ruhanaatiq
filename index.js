@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId  } = require('mongodb');
 require('dotenv').config();
 
 const app = express();
@@ -76,6 +76,12 @@ async function run() {
     app.get('/', (req, res) => {
       res.send('🚗 Welcome to the car rental world!');
     });
+app.get("/cars/:id", async (req, res) => {
+  const id = req.params.id;
+  const car = await carsCollection.findOne({ _id: new ObjectId(id) });
+  if (!car) return res.status(404).send("Car not found");
+  res.send(car);
+});
 
     // Start server
     app.listen(port, () => {
