@@ -26,4 +26,5 @@ This is the backend for the Car Rental application. It provides RESTful APIs for
 1. Clone the repository
    ```bash
    git clone https://github.com/ruhanaatiq/car-rental-server.git
+   local host (http://localhost:3000)
    cd car-rental-server
