@@ -331,8 +331,7 @@ app.put("/api/bookings/modify/:id", verifyJWT, async (req, res) => {
 
   res.send(result);
 });
-const handler = (req, res) => {
+module.exports = (req, res) => {
   app(req, res);
 };
 
-export default handler;
