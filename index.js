@@ -30,7 +30,6 @@ let client;
 let cars;
 let bookings;
 let indexesEnsured = false;
-let feedbacks;
 let initialized = false;
 
 async function connectDB() {
@@ -39,14 +38,14 @@ async function connectDB() {
 
   const uri =
     process.env.MONGODB_URI ||
-    mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.neq8pcg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0;
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.neq8pcg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
   try {
     if (!client) {
       client = new MongoClient(uri, {
         serverApi: {
           version: ServerApiVersion.v1,
-          strict: false,
+          strict: true,
           deprecationErrors: true,
         },
       });
@@ -60,7 +59,6 @@ async function connectDB() {
     const db = client.db("carDB");
     cars = db.collection("rental");
     bookings = db.collection("bookings");
-    feedbacks = db.collection("feedbacks");
 
     if (!indexesEnsured) {
       await bookings.createIndex({ carId: 1, startDate: 1, endDate: 1 }); // fast overlap
@@ -77,12 +75,6 @@ async function connectDB() {
     client = undefined;
     throw err;
   }
-}
-if (!indexesEnsured) {
-  await bookings.createIndex({ carId: 1, startDate: 1, endDate: 1 });
-  await bookings.createIndex({ ownerEmail: 1, createdAt: -1 });
-  await feedbacks.createIndex({ createdAt: -1 });
-  indexesEnsured = true;
 }
 
 /* ---------- Auth ---------- */
