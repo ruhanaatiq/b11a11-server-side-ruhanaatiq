@@ -39,7 +39,7 @@ async function connectDB() {
 
   const uri =
     process.env.MONGODB_URI ||
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.neq8pcg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+    mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.neq8pcg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0;
 
   try {
     if (!client) {
