@@ -30,6 +30,7 @@ let client;
 let cars;
 let bookings;
 let indexesEnsured = false;
+let feedbacks;
 let initialized = false;
 
 async function connectDB() {
@@ -59,6 +60,7 @@ async function connectDB() {
     const db = client.db("carDB");
     cars = db.collection("rental");
     bookings = db.collection("bookings");
+    feedbacks = db.collection("feedbacks");
 
     if (!indexesEnsured) {
       await bookings.createIndex({ carId: 1, startDate: 1, endDate: 1 }); // fast overlap
@@ -75,6 +77,12 @@ async function connectDB() {
     client = undefined;
     throw err;
   }
+}
+if (!indexesEnsured) {
+  await bookings.createIndex({ carId: 1, startDate: 1, endDate: 1 });
+  await bookings.createIndex({ ownerEmail: 1, createdAt: -1 });
+  await feedbacks.createIndex({ createdAt: -1 });
+  indexesEnsured = true;
 }
 
 /* ---------- Auth ---------- */
