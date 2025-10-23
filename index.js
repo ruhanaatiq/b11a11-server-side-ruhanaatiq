@@ -29,6 +29,7 @@ app.use(express.json());
 let client;
 let cars;
 let bookings;
+let feedbacks;
 let indexesEnsured = false;
 let initialized = false;
 
@@ -59,10 +60,12 @@ async function connectDB() {
     const db = client.db("carDB");
     cars = db.collection("rental");
     bookings = db.collection("bookings");
+    feedbacks = db.collection("feedbacks");   
 
     if (!indexesEnsured) {
       await bookings.createIndex({ carId: 1, startDate: 1, endDate: 1 }); // fast overlap
       await bookings.createIndex({ ownerEmail: 1, createdAt: -1 });
+  await feedbacks.createIndex({ createdAt: -1 });   // 👈 add this
       indexesEnsured = true;
     }
 
@@ -97,6 +100,39 @@ app.post("/api/jwt", (req, res) => {
   );
   res.send({ token });
 });
+/* ---------- Feedbacks ---------- */
+app.post("/api/feedback", async (req, res) => {
+  try {
+    await connectDB();
+    const { email, category, rating, subject, message, bookingId } = req.body || {};
+    const r = Number(rating);
+
+    if (!email || !subject?.trim() || !message?.trim()) {
+      return res.status(400).send({ error: "email, subject, and message are required" });
+    }
+    if (Number.isNaN(r) || r < 1 || r > 5) {
+      return res.status(400).send({ error: "Rating must be 1–5" });
+    }
+
+    const doc = {
+      email,
+      category: category || "General",
+      rating: r,
+      subject: subject.trim(),
+      message: message.trim(),
+      bookingId: bookingId || null,
+      createdAt: new Date(),
+      status: "new",
+    };
+
+    const out = await feedbacks.insertOne(doc);
+    res.status(201).send({ ok: true, id: out.insertedId });
+  } catch (e) {
+    console.error("FEEDBACK_ERROR:", e);
+    res.status(500).send({ error: "Server error: " + e.message });
+  }
+});
+
 
 /* ---------- Cars ---------- */
 app.get("/api/cars", async (req, res) => {
